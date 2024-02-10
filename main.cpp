@@ -15,6 +15,16 @@ struct ZakladniTexty
 	const string hardText = "HARD obtížnost\n- Nezačínáte s žádnými penězi\n- Nezačínáte s žádnými vojáky\n- Dokud neinvestujete, získáváte 2 mld. peněz za kolo\n- Chcete-li vyhrát, musíte získat 70 území\n- Investovat můžete do 5 peněz za kolo\n- Invaze do vaší země se konají každých 5 kol\n- Invaze jsou vždy po 2000 vojácích";
 };
 
+struct Hra
+{
+	int penize;
+	int vojaci;
+	int kola = 1;
+	int obsadit;
+	int banka = 0;
+	int penize_za_kolo = 2;
+};
+
 bool obtiznost_switch(char obtiznost, ZakladniTexty zakladniTexty, int& penize, int& vojaci, int& obsadit, string& zakladniText)
 {
 	switch (obtiznost)
@@ -42,14 +52,27 @@ bool obtiznost_switch(char obtiznost, ZakladniTexty zakladniTexty, int& penize, 
 	}
 }
 
-struct Hra
+bool vyber_switch(char vyber, Hra hra)
 {
-	int penize;
-	int vojaci;
-	int obsadit;
-	int banka = 0;
-	int penize_za_kolo = 2;
-};
+	switch (vyber)
+	{
+		case 'K':
+			return 0;
+		case 'V':
+			return 0;
+		case 'I':
+			return 0;
+		case 'B':
+			return 0;
+		case 'D':
+			return 0;
+		case 'E':
+			cout << "Odešel jsi ze hry.";
+			exit(0);
+		default:
+			return 1;
+	}
+}
 
 int main() {
 	Hra hra;
@@ -67,11 +90,33 @@ int main() {
 			error();
 			continue;
 		}
-		obtiznost_str = toupper((char)obtiznost_str[0]);
+
+		obtiznost_str = toupper(obtiznost);
 		obtiznost_switch(obtiznost, zakladniTexty, hra.penize, hra.vojaci, hra.obsadit, zakladniText) ? [] {error(); main();}() : [zakladniText] {cout << zakladniText << endl << "Stiskem ENTER pokračujte: ";}();
 		quit = true;
 	}
 	
 	cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	cin.get();
+
+	cout << "Toto je vylepšená verze hry textova_hra.py. Jestli chcete mít zážitek ze hry textova_hra, jako takový, stáhněte si KV OS BETA 0.6.\n" << endl;
+	while (true) {
+		string vyber_str;
+		char& vyber = vyber_str[0];
+
+		cout << hra.kola << ". KOLO! \nK = Koupit vojáky, V = Válka, I = Investovat, B = Banka, D = Další kolo, E = Exit: ";
+		cin >> vyber_str;
+		if (vyber_str.length() > 1) {
+			error();
+			continue;
+		}
+
+		vyber_str = toupper(vyber);
+		if (vyber_switch(vyber, hra)) {
+			error();
+			continue;
+		}
+
+		cout << "Dobrý den!";
+	}
 }
