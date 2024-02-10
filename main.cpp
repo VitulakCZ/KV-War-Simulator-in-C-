@@ -67,7 +67,7 @@ bool vyber_switch(char vyber, Hra hra)
 		case 'D':
 			return 0;
 		case 'E':
-			cout << "Odešel jsi ze hry.";
+			cout << "Odešel jsi ze hry." << endl;
 			exit(0);
 		default:
 			return 1;
@@ -117,6 +117,6 @@ int main() {
 			continue;
 		}
 
-		cout << "Dobrý den!";
+		cout << "Dobrý den!" << endl;
 	}
 }
