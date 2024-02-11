@@ -1,6 +1,7 @@
 #include <iostream>
 #include <limits>
 #include <algorithm>
+#include <cmath>
 
 using namespace std;
 
@@ -90,6 +91,36 @@ bool valka(Hra& hra)
 	}
 }
 
+bool investovat(Hra& hra, bool isEasy)
+{
+	string investice_str;
+	int investice;
+
+	cout << "Kolik chceš investovat?\n6 (+1 peníz za kolo)\n10 (+2 peníze za kolo): ";
+	cin >> investice_str;
+	if (!is_number(investice_str))
+		return 1;
+
+	investice = stoi(investice_str);
+	if (investice != 6 && investice != 10)
+		return 1;
+
+	if (hra.penize < investice) {
+		cout << "NEMÁŠ DOSTATEK FINANCÍ!";
+		return 0;
+	}
+
+	if (hra.penize_za_kolo > ((investice == 6) ? 4 : 3) && !isEasy || hra.penize_za_kolo > ((investice == 6) ? 9 : 8)) {
+		cout << "Už jsi investoval až moc peněz!";
+		return 0;
+	}
+
+	hra.penize -= investice;
+	hra.penize_za_kolo += floor(investice / 5);
+	cout << hra.penize_za_kolo;
+	return 0;
+}
+
 bool obtiznost_switch(char obtiznost, ZakladniTexty zakladniTexty, int& penize, int& vojaci, int& obsadit, string& zakladniText)
 {
 	switch (obtiznost)
@@ -117,7 +148,7 @@ bool obtiznost_switch(char obtiznost, ZakladniTexty zakladniTexty, int& penize, 
 	}
 }
 
-bool vyber_switch(char vyber, Hra& hra)
+bool vyber_switch(char vyber, Hra& hra, char obtiznost)
 {
 	switch (vyber)
 	{
@@ -126,7 +157,7 @@ bool vyber_switch(char vyber, Hra& hra)
 		case 'V':
 			return valka(hra);
 		case 'I':
-			return 0;
+			return investovat(hra, obtiznost == 'E');
 		case 'B':
 			return 0;
 		case 'D':
@@ -144,10 +175,12 @@ int main() {
 	ZakladniTexty zakladniTexty;
 	string zakladniText;
 
+	char* obtiznost;
+
 	bool quit = false;
 	while (!quit) {
 		string obtiznost_str;
-		char& obtiznost = obtiznost_str[0];
+		obtiznost = &obtiznost_str[0];
 
 		cout << "Na jakou chceš hrát obtížnost\nE = Easy\nN = Normal\nH = Hard: ";
 		cin >> obtiznost_str;
@@ -156,8 +189,8 @@ int main() {
 			continue;
 		}
 
-		obtiznost_str = toupper(obtiznost);
-		obtiznost_switch(obtiznost, zakladniTexty, hra.penize, hra.vojaci, hra.obsadit, zakladniText) ? [] {error(); main();}() : [zakladniText] {cout << zakladniText << endl << "Stiskem ENTER pokračujte: ";}();
+		obtiznost_str = toupper(*obtiznost);
+		obtiznost_switch(*obtiznost, zakladniTexty, hra.penize, hra.vojaci, hra.obsadit, zakladniText) ? [] {error(); main();}() : [zakladniText] {cout << zakladniText << endl << "Stiskem ENTER pokračujte: ";}();
 		quit = true;
 	}
 
@@ -177,7 +210,7 @@ int main() {
 		}
 
 		vyber_str = toupper(vyber);
-		if (vyber_switch(vyber, hra)) {
+		if (vyber_switch(vyber, hra, *obtiznost)) {
 			error();
 			continue;
 		}
