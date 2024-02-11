@@ -1,11 +1,18 @@
 #include <iostream>
 #include <limits>
+#include <algorithm>
 
 using namespace std;
 
+bool is_number(const string& s)
+{
+	return !s.empty() && find_if(s.begin(), 
+		s.end(), [](unsigned char c) { return !isdigit(c); }) == s.end();
+}
+
 void error()
 {
-	cout << "ERROR: Nesprávné zadání!" << endl;
+	cout << "ERROR: Nesprávné zadání!\n" << endl;
 }
 
 struct ZakladniTexty
@@ -24,6 +31,33 @@ struct Hra
 	int banka = 0;
 	int penize_za_kolo = 2;
 };
+
+bool koupitVojaky(Hra& hra)
+{
+	string pocet_str;
+	int pocet;
+
+	cout << "Máš " << hra.vojaci << " vojáků, peněz " << hra.penize << ", cena za 1000 vojáků je 1 mld. Kolik jich chceš koupit? ";
+	cin >> pocet_str;
+	if (!is_number(pocet_str))
+		return 1;
+	
+	pocet = stoi(pocet_str);
+	if (pocet % 1000 != 0) {
+		cout << "Nezadal jsi číslo dělitelné 1000!";
+		return 0;
+	}
+
+	if (hra.penize < pocet / 1000) {
+		cout << "NEMÁŠ DOSTATEK FINANCÍ!";
+		return 0;
+	}
+
+	hra.penize -= pocet / 1000;
+	hra.vojaci += pocet;
+	cout << "Nakoupeno " << pocet << " vojáků." << endl << "Celkem máš " << hra.vojaci << " vojáků, zbývá ti " << hra.penize << " peněz.";
+	return 0;
+}
 
 bool obtiznost_switch(char obtiznost, ZakladniTexty zakladniTexty, int& penize, int& vojaci, int& obsadit, string& zakladniText)
 {
@@ -52,12 +86,12 @@ bool obtiznost_switch(char obtiznost, ZakladniTexty zakladniTexty, int& penize, 
 	}
 }
 
-bool vyber_switch(char vyber, Hra hra)
+bool vyber_switch(char vyber, Hra& hra)
 {
 	switch (vyber)
 	{
 		case 'K':
-			return 0;
+			return koupitVojaky(hra);
 		case 'V':
 			return 0;
 		case 'I':
@@ -117,6 +151,6 @@ int main() {
 			continue;
 		}
 
-		cout << "Dobrý den!" << endl;
+		cout << endl << endl;
 	}
 }
