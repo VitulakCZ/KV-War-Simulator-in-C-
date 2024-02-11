@@ -59,6 +59,37 @@ bool koupitVojaky(Hra& hra)
 	return 0;
 }
 
+bool valka(Hra& hra)
+{
+	string obsadit_str;
+	char& obsadit = obsadit_str[0];
+
+	cout << "Musíš obsadit ještě " << hra.obsadit << " území. Na jedno území potřebuješ 2000 vojáků, chceš zaútočit? A = Ano, N = Ne: ";
+	cin >> obsadit_str;
+	if (obsadit_str.length() > 1)
+		return 1;
+
+	obsadit_str = toupper(obsadit);
+	switch (obsadit)
+	{
+	case 'A':
+		if (hra.vojaci < 2000) {
+			cout << "NEMÁŠ DOSTATEK VOJÁKŮ!";
+			return 0;
+		}
+
+		hra.vojaci -= 2000;
+		hra.obsadit -= 1;
+		cout << "Zaútočil jsi! Zbývá ti " << hra.vojaci << " vojáků.";
+		return 0;
+	case 'N':
+		cout << "NE!";
+		return 0;
+	default:
+		return 1;
+	}
+}
+
 bool obtiznost_switch(char obtiznost, ZakladniTexty zakladniTexty, int& penize, int& vojaci, int& obsadit, string& zakladniText)
 {
 	switch (obtiznost)
@@ -93,7 +124,7 @@ bool vyber_switch(char vyber, Hra& hra)
 		case 'K':
 			return koupitVojaky(hra);
 		case 'V':
-			return 0;
+			return valka(hra);
 		case 'I':
 			return 0;
 		case 'B':
@@ -129,7 +160,7 @@ int main() {
 		obtiznost_switch(obtiznost, zakladniTexty, hra.penize, hra.vojaci, hra.obsadit, zakladniText) ? [] {error(); main();}() : [zakladniText] {cout << zakladniText << endl << "Stiskem ENTER pokračujte: ";}();
 		quit = true;
 	}
-	
+
 	cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	cin.get();
 
