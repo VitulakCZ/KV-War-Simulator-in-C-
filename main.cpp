@@ -2,10 +2,12 @@
 #include <limits>
 #include <algorithm>
 #include <cmath>
+#include <regex>
+#include <vector>
 
 using namespace std;
 
-bool is_number(const string& s)
+bool is_number(const string s)
 {
 	return !s.empty() && find_if(s.begin(), 
 		s.end(), [](unsigned char c) { return !isdigit(c); }) == s.end();
@@ -82,6 +84,13 @@ bool valka(Hra& hra)
 		hra.vojaci -= 2000;
 		hra.obsadit -= 1;
 		cout << "Zaútočil jsi! Zbývá ti " << hra.vojaci << " vojáků.";
+
+		if (hra.obsadit == 0) {
+			cout << "GRATULACE!!! Dohrál jsi hru!! Jsi dobrý!!\nStiskem ENTER pokračuj: ";
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cin.get();
+			exit(0);
+		}
 		return 0;
 	case 'N':
 		cout << "NE!";
@@ -118,6 +127,63 @@ bool investovat(Hra& hra, bool isEasy)
 	hra.penize -= investice;
 	hra.penize_za_kolo += floor(investice / 5);
 	cout << hra.penize_za_kolo;
+	return 0;
+}
+
+bool banka(Hra& hra)
+{
+	string banka_str;
+	int banka;
+
+	if (hra.banka > 3) {
+		cout << "Už sis půjčil až moc peněz!";
+		return 0;
+	}
+
+	cout << "Kolik si chceš půjčit? 1, 2, 3 mld? ";
+	cin >> banka_str;
+	if (!is_number(banka_str))
+		return 1;
+	
+	banka = stoi(banka_str);
+	if (banka < 1 || banka > 3)
+		return 1;
+
+	hra.penize += banka;
+	hra.banka += banka * 2;
+	
+	cout << "Dluh v tento moment máš " << hra.banka << " mld.";
+	return 0;
+}
+
+bool dalsi_kolo(Hra& hra, char obtiznost)
+{
+	if (hra.kola++ == 50) {
+		cout << "Nestihl jsi dohrát hru pod 50 kol.\nGAME OVER" << endl;
+		exit(0);
+	}
+	hra.penize += hra.penize_za_kolo;
+	hra.penize -= hra.banka;
+	hra.banka = 0;
+
+	const bool isHard = obtiznost == 'H';
+	const bool isEasy = obtiznost == 'E';
+
+	for (int kolo = 0; kolo < 50; kolo += isEasy ? 10 : 5)
+	{
+		if (kolo != hra.kola)
+			continue;
+		
+		if (hra.vojaci < 1000 || (hra.vojaci < 2000 && isHard)) {
+			cout << "Zaútočili na tebe, nemáš dostatek vojáků na protiútok.\nGAME OVER" << endl;
+			exit(0);
+		}
+
+		hra.vojaci -= isHard ? 2000 : 1000;
+		cout << "Zaútočili na tebe! Nově máš " << hra.vojaci << " vojáků!";
+		hra.kola += 1;
+		break;
+	}
 	return 0;
 }
 
@@ -159,9 +225,9 @@ bool vyber_switch(char vyber, Hra& hra, char obtiznost)
 		case 'I':
 			return investovat(hra, obtiznost == 'E');
 		case 'B':
-			return 0;
+			return banka(hra);
 		case 'D':
-			return 0;
+			return dalsi_kolo(hra, obtiznost);
 		case 'E':
 			cout << "Odešel jsi ze hry." << endl;
 			exit(0);
@@ -170,17 +236,17 @@ bool vyber_switch(char vyber, Hra& hra, char obtiznost)
 	}
 }
 
-int main() {
-	Hra hra;
+int main()
+{
 	ZakladniTexty zakladniTexty;
 	string zakladniText;
+	Hra hra;
 
-	char* obtiznost;
+	char obtiznost;
 
 	bool quit = false;
 	while (!quit) {
 		string obtiznost_str;
-		obtiznost = &obtiznost_str[0];
 
 		cout << "Na jakou chceš hrát obtížnost\nE = Easy\nN = Normal\nH = Hard: ";
 		cin >> obtiznost_str;
@@ -189,18 +255,18 @@ int main() {
 			continue;
 		}
 
-		obtiznost_str = toupper(*obtiznost);
-		obtiznost_switch(*obtiznost, zakladniTexty, hra.penize, hra.vojaci, hra.obsadit, zakladniText) ? [] {error(); main();}() : [zakladniText] {cout << zakladniText << endl << "Stiskem ENTER pokračujte: ";}();
+		obtiznost = toupper(obtiznost_str[0]);
+		obtiznost_switch(obtiznost, zakladniTexty, hra.penize, hra.vojaci, hra.obsadit, zakladniText) ? [] {error(); main();}() : [zakladniText] {cout << zakladniText << endl << "Stiskem ENTER pokračuj: ";}();
 		quit = true;
 	}
 
-	cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 	cin.get();
 
 	cout << "Toto je vylepšená verze hry textova_hra.py. Jestli chcete mít zážitek ze hry textova_hra, jako takový, stáhněte si KV OS BETA 0.6.\n" << endl;
 	while (true) {
 		string vyber_str;
-		char& vyber = vyber_str[0];
+		const char& vyber = vyber_str[0];
 
 		cout << hra.kola << ". KOLO! \nK = Koupit vojáky, V = Válka, I = Investovat, B = Banka, D = Další kolo, E = Exit: ";
 		cin >> vyber_str;
@@ -208,13 +274,12 @@ int main() {
 			error();
 			continue;
 		}
-
 		vyber_str = toupper(vyber);
-		if (vyber_switch(vyber, hra, *obtiznost)) {
+		if (vyber_switch(vyber, hra, obtiznost)) {
 			error();
 			continue;
 		}
 
-		cout << endl << endl;
+		if (vyber != 'D') cout << endl << endl;
 	}
 }
