@@ -1,9 +1,6 @@
 #include <iostream>
-#include <limits>
 #include <algorithm>
 #include <cmath>
-#include <regex>
-#include <vector>
 
 using namespace std;
 
@@ -44,7 +41,7 @@ bool koupitVojaky(Hra& hra)
 	cin >> pocet_str;
 	if (!is_number(pocet_str))
 		return 1;
-	
+
 	pocet = stoi(pocet_str);
 	if (pocet % 1000 != 0) {
 		cout << "Nezadal jsi číslo dělitelné 1000!";
@@ -144,21 +141,21 @@ bool banka(Hra& hra)
 	cin >> banka_str;
 	if (!is_number(banka_str))
 		return 1;
-	
+
 	banka = stoi(banka_str);
 	if (banka < 1 || banka > 3)
 		return 1;
 
 	hra.penize += banka;
 	hra.banka += banka * 2;
-	
+
 	cout << "Dluh v tento moment máš " << hra.banka << " mld.";
 	return 0;
 }
 
 bool dalsi_kolo(Hra& hra, char obtiznost)
 {
-	if (hra.kola++ == 50) {
+	if (++hra.kola == 50) {
 		cout << "Nestihl jsi dohrát hru pod 50 kol.\nGAME OVER" << endl;
 		exit(0);
 	}
@@ -173,7 +170,7 @@ bool dalsi_kolo(Hra& hra, char obtiznost)
 	{
 		if (kolo != hra.kola)
 			continue;
-		
+
 		if (hra.vojaci < 1000 || (hra.vojaci < 2000 && isHard)) {
 			cout << "Zaútočili na tebe, nemáš dostatek vojáků na protiútok.\nGAME OVER" << endl;
 			exit(0);
@@ -218,21 +215,21 @@ bool vyber_switch(char vyber, Hra& hra, char obtiznost)
 {
 	switch (vyber)
 	{
-		case 'K':
-			return koupitVojaky(hra);
-		case 'V':
-			return valka(hra);
-		case 'I':
-			return investovat(hra, obtiznost == 'E');
-		case 'B':
-			return banka(hra);
-		case 'D':
-			return dalsi_kolo(hra, obtiznost);
-		case 'E':
-			cout << "Odešel jsi ze hry." << endl;
-			exit(0);
-		default:
-			return 1;
+	case 'K':
+		return koupitVojaky(hra);
+	case 'V':
+		return valka(hra);
+	case 'I':
+		return investovat(hra, obtiznost == 'E');
+	case 'B':
+		return banka(hra);
+	case 'D':
+		return dalsi_kolo(hra, obtiznost);
+	case 'E':
+		cout << "Odešel jsi ze hry." << endl;
+		exit(0);
+	default:
+		return 1;
 	}
 }
 
