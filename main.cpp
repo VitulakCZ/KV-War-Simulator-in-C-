@@ -17,8 +17,8 @@ void error()
 
 struct ZakladniTexty
 {
-	const string easyText = "EASY obtížnost\n- Začínáte s 3 mld. penězi\n- Začínáte s 2000 vojáky\n- Dokud neinvestujete, získáváte 2 mld. peněz za kolo\n- Chcete-li vyhrát, musíte získat 25 území\n- Investovat můžete do 10 peněz za kolo\n- Invaze do vaší země se konají každých 10 kol\n- Invaze jsou vždy po 1000 vojácích";
-	const string normalText = "NORMAL obtížnost\n- Začínáte s 3 mld. penězi\n- Nezačínáte s žádnými vojáky\n- Dokud neinvestujete, získáváte 2 mld. peněz za kolo\n- Chcete-li vyhrát, musíte získat 55 území\n- Investovat můžete do 5 peněz za kolo\n- Invaze do vaší země se konají každých 5 kol\n- Invaze jsou vždy po 1000 vojácích";
+	const string easyText = "EASY obtížnost\n- Začínáte s 3 mld. penězi\n- Začínáte s 2000 vojáky\n- Dokud neinvestujete, získáváte 2 mld. peněz za kolo\n- Chcete-li vyhrát, musíte získat 30 území\n- Investovat můžete do 10 peněz za kolo\n- Invaze do vaší země se konají každých 10 kol\n- Invaze jsou vždy po 1000 vojácích";
+	const string normalText = "NORMAL obtížnost\n- Začínáte s 3 mld. penězi\n- Nezačínáte s žádnými vojáky\n- Dokud neinvestujete, získáváte 2 mld. peněz za kolo\n- Chcete-li vyhrát, musíte získat 57 území\n- Investovat můžete do 5 peněz za kolo\n- Invaze do vaší země se konají každých 5 kol\n- Invaze jsou vždy po 1000 vojácích";
 	const string hardText = "HARD obtížnost\n- Nezačínáte s žádnými penězi\n- Nezačínáte s žádnými vojáky\n- Dokud neinvestujete, získáváte 2 mld. peněz za kolo\n- Chcete-li vyhrát, musíte získat 70 území\n- Investovat můžete do 5 peněz za kolo\n- Invaze do vaší země se konají každých 5 kol\n- Invaze jsou vždy po 2000 vojácích";
 };
 
@@ -123,7 +123,12 @@ bool investovat(Hra& hra, bool isEasy)
 
 	hra.penize -= investice;
 	hra.penize_za_kolo += floor(investice / 5);
-	cout << hra.penize_za_kolo;
+	string penize_str;
+	if (hra.penize_za_kolo < 5)
+		penize_str = " peníze za kolo";
+	else
+		penize_str = " peněz za kolo";
+	cout << hra.penize_za_kolo << penize_str;
 	return 0;
 }
 
@@ -191,13 +196,13 @@ bool obtiznost_switch(char obtiznost, ZakladniTexty zakladniTexty, int& penize, 
 	case 'E':
 		penize = 3;
 		vojaci = 2000;
-		obsadit = 25;
+		obsadit = 30;
 		zakladniText = zakladniTexty.easyText;
 		return 0;
 	case 'N':
 		penize = 3;
 		vojaci = 0;
-		obsadit = 55;
+		obsadit = 57;
 		zakladniText = zakladniTexty.normalText;
 		return 0;
 	case 'H':
