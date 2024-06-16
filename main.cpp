@@ -1,9 +1,13 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
-
+#ifndef NO_SFML
+#include <SFML/Audio.hpp>
+#endif
 using namespace std;
-
+#ifndef NO_SFML
+sf::Music music;
+#endif
 bool is_number(const string s)
 {
 	return !s.empty() && find_if(s.begin(), 
@@ -83,7 +87,11 @@ bool valka(Hra& hra)
 		cout << "Zaútočil jsi! Zbývá ti " << hra.vojaci << " vojáků.";
 
 		if (hra.obsadit == 0) {
-			cout << "GRATULACE!!! Dohrál jsi hru!! Jsi dobrý!!\nStiskem ENTER pokračuj: ";
+            #ifndef NO_SFML
+            music.openFromFile("teticka_song.wav");
+            music.play();
+            #endif
+			cout << "\nGRATULACE!!! Dohrál jsi hru!! Jsi dobrý!!\nStiskem ENTER pokračuj: ";
 			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			cin.get();
 			exit(0);
@@ -182,7 +190,7 @@ bool dalsi_kolo(Hra& hra, char obtiznost)
 		}
 
 		hra.vojaci -= isHard ? 2000 : 1000;
-		cout << "Zaútočili na tebe! Nově máš " << hra.vojaci << " vojáků!";
+		cout << "Zaútočili na tebe! Nově máš " << hra.vojaci << " vojáků!\n";
 		hra.kola += 1;
 		break;
 	}
@@ -265,7 +273,12 @@ int main()
 	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 	cin.get();
 
-	cout << "Toto je vylepšená verze hry textova_hra.py. Jestli chcete mít zážitek ze hry textova_hra, jako takový, stáhněte si KV OS BETA 0.6.\n" << endl;
+    #ifndef NO_SFML
+    music.setLoop(true);
+    music.openFromFile("kv_war_simulator_soundtrack.wav");
+    music.play();
+    #endif
+    cout << "Toto je vylepšená verze hry textova_hra.py. Jestli chcete mít zážitek ze hry textova_hra, jako takový, stáhněte si KV OS BETA 0.6.\n" << endl;
 	while (true) {
 		string vyber_str;
 		const char& vyber = vyber_str[0];
