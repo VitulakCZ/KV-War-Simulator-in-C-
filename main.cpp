@@ -145,7 +145,7 @@ bool banka(Hra& hra)
 	string banka_str;
 	int banka;
 
-	if (hra.banka > 3) {
+	if (hra.banka >= 6) {
 		cout << "Už sis půjčil až moc peněz!";
 		return 0;
 	}
@@ -159,8 +159,12 @@ bool banka(Hra& hra)
 	if (banka < 1 || banka > 3)
 		return 1;
 
-	hra.penize += banka;
-	hra.banka += banka * 2;
+    if (hra.banka + banka * 2 > 6)
+        cout << "Nemůžeš si tolik půjčit!\n";
+    else {
+        hra.penize += banka;
+        hra.banka += banka * 2;
+    }
 
 	cout << "Dluh v tento moment máš " << hra.banka << " mld.";
 	return 0;
